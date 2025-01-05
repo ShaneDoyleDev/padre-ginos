@@ -7,8 +7,29 @@ const intl = new Intl.NumberFormat("en-US", {
 });
 
 export default function Order() {
+  const [pizzaTypes, setPizzaTypes] = useState([]);
   const [pizzaType, setPizzaType] = useState("pepperoni");
   const [pizzaSize, setPizzaSize] = useState("M");
+  const [loading, setLoading] = useState(true);
+
+  let price, selectedPizza;
+  if (!loading) {
+    selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
+    price = intl.format(selectedPizza.sizes?.[pizzaSize] ?? "");
+  }
+
+  useEffect(() => {
+    async function fetchPizzaTypes() {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      const pizzasRes = await fetch("/api/pizzas");
+      const pizzasJson = await pizzasRes.json();
+      setPizzaTypes(pizzasJson);
+      setLoading(false);
+    }
+
+    fetchPizzaTypes();
+  }, []);
 
   return (
     <div className="order">
